@@ -27,6 +27,7 @@
     "@tanstack/react-query-devtools": "^5.83.0",
     "axios": "^1.11.0",
     "bun-plugin-tailwind": "^0.0.14",
+    "canvas": "^3.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.9",
@@ -69,6 +70,8 @@
   },
   "trustedDependencies": [
     "@tailwindcss/oxide",
-    "sharp"
+    "canvas",
+    "sharp",
+    "unrs-resolver"
   ]
 }

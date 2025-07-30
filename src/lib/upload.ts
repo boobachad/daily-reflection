@@ -3,8 +3,6 @@ import path from "path"
 import { v4 as uuidv4 } from "uuid"
 import { MissingImageError } from "@/types/entry"
 import { DbEntry } from "@/models/entry"
-import { Readable } from "stream"
-import { finished } from "stream/promises"
 
 /**
  * Verify if an image exists at the given URL
@@ -94,7 +92,38 @@ export async function cleanupInvalidImageUrls(entry: DbEntry): Promise<DbEntry> 
 }
 
 /**
- * Downloads an image from a Napchart URL, validates it, and saves it to /public/uploads/.
+ * Add white background to an image buffer using Canvas API
+ */
+async function addWhiteBackground(imageBuffer: Buffer): Promise<Buffer> {
+    // Import canvas dynamically to avoid issues in environments without canvas support
+    try {
+        const { createCanvas, loadImage } = await import('canvas')
+
+        // Load the original image
+        const img = await loadImage(imageBuffer)
+
+        // Create canvas with same dimensions
+        const canvas = createCanvas(img.width, img.height)
+        const ctx = canvas.getContext('2d')
+
+        // Fill with white background
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+        // Draw the original image on top
+        ctx.drawImage(img, 0, 0)
+
+        // Return the processed image as buffer
+        return canvas.toBuffer('image/png')
+    } catch (error) {
+        console.warn('Canvas not available, returning original image:', error)
+        // If canvas is not available, return original image
+        return imageBuffer
+    }
+}
+
+/**
+ * Downloads an image from a Napchart URL, adds white background, validates it, and saves it to /public/uploads/.
  * Returns the relative path (e.g., /uploads/napchart-<chartid>-<hash>.png) or throws on error.
  */
 export async function downloadAndSaveImageFromUrl(url: string, fileName: string): Promise<string> {
@@ -125,10 +154,16 @@ export async function downloadAndSaveImageFromUrl(url: string, fileName: string)
     const safeFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_")
     const destination = path.join(uploadsDir, safeFileName)
 
-    // Save file
+    // Download and process image
     if (!res.body) throw new Error("No response body")
     const arrayBuffer = await res.arrayBuffer()
-    await fs.promises.writeFile(destination, Buffer.from(arrayBuffer))
+    const originalBuffer = Buffer.from(arrayBuffer)
+
+    // Add white background to Napchart images
+    const processedBuffer = await addWhiteBackground(originalBuffer)
+
+    // Save processed file
+    await fs.promises.writeFile(destination, processedBuffer)
 
     // Return relative path for DB
     return `/uploads/schedules/${safeFileName}`

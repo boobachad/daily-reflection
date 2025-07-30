@@ -191,16 +191,8 @@ export async function DELETE(
 ) {
     try {
         await connectToDatabase()
-        const dateString = params.date_string
-        const today = getTodayDateString()
-
-        // Forbid deleting past entries
-        if (isPastDate(dateString)) {
-            return NextResponse.json(
-                { error: "Cannot delete past entries" },
-                { status: 403 }
-            )
-        }
+        const resolvedParams = await params;
+        const dateString = resolvedParams.date_string
 
         const entry = await EntryModel.findOne({ date: new Date(dateString) })
         if (!entry) {
