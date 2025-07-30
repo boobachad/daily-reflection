@@ -41,7 +41,6 @@ export default function ImageUploader({ initialImageUrl, onImageChange, dateStri
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [base64Preview, setBase64Preview] = useState<string | null>(null)
   const [showUrlInput, setShowUrlInput] = useState(false)
-  const lastSetByEffect = useRef<string | null>(null)
 
   // Determine initial source type
   useEffect(() => {
@@ -91,7 +90,7 @@ export default function ImageUploader({ initialImageUrl, onImageChange, dateStri
 
     setImageState(prev => ({ ...prev, isUploading: false, hasError: false }))
     if (fileInputRef.current) fileInputRef.current.value = ''
-  }, [dateString, onImageChange])
+  }, [onImageChange])
 
   const handleUrlSubmit = useCallback(async () => {
     if (!inputUrl) {
@@ -120,7 +119,7 @@ export default function ImageUploader({ initialImageUrl, onImageChange, dateStri
         setImageState(prev => ({ ...prev, isUploading: false }))
       }
       img.src = urlToValidate
-    } catch (error) {
+    } catch {
       toast.error("Failed to validate URL")
       setImageState(prev => ({ ...prev, isUploading: false }))
     }
@@ -131,11 +130,18 @@ export default function ImageUploader({ initialImageUrl, onImageChange, dateStri
     setSourceType(null)
     setInputUrl("")
     onImageChange('', true)
-  }, [dateString, onImageChange])
+  }, [onImageChange])
 
   const handleInputUrlChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInputUrl(e.target.value)
   }, [])
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleUrlSubmit()
+    }
+  }, [handleUrlSubmit])
 
   const hasImage = !!(base64Preview || localImageUrl)
 
@@ -173,7 +179,7 @@ export default function ImageUploader({ initialImageUrl, onImageChange, dateStri
             {imageState.hasError ? (
               <div className="flex items-center justify-center h-full flex-col">
                 <p className="text-red-500">Image not found</p>
-                <p className="text-xs text-muted-foreground mt-1">It's not you, it's us.</p>
+                <p className="text-xs text-muted-foreground mt-1">It&apos;s not you, it&apos;s us.</p>
               </div>
             ) : (
               <Image
@@ -226,6 +232,7 @@ export default function ImageUploader({ initialImageUrl, onImageChange, dateStri
                 type="text"
                 value={inputUrl}
                 onChange={handleInputUrlChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Enter Chart ID or Napchart URL"
                 className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-background text-foreground placeholder:text-muted-foreground"
               />
@@ -281,6 +288,7 @@ export default function ImageUploader({ initialImageUrl, onImageChange, dateStri
                 type="text"
                 value={inputUrl}
                 onChange={handleInputUrlChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Enter Napchart URL"
                 className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-background text-foreground placeholder:text-muted-foreground"
               />

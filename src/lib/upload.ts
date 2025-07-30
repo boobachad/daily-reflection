@@ -3,16 +3,8 @@ import path from "path"
 import { v4 as uuidv4 } from "uuid"
 import { MissingImageError } from "@/types/entry"
 import { DbEntry } from "@/models/entry"
-import { mkdir } from "fs/promises"
 import { Readable } from "stream"
 import { finished } from "stream/promises"
-
-const UPLOAD_DIR = path.join(process.cwd(), "public/uploads/schedules")
-
-async function ensureUploadDir() {
-    await fs.promises.mkdir(UPLOAD_DIR, { recursive: true })
-    return UPLOAD_DIR
-}
 
 /**
  * Verify if an image exists at the given URL
@@ -66,8 +58,8 @@ export async function deleteFile(fileUrl: string) {
         const filePath = path.join(process.cwd(), 'public', fileUrl)
         await fs.promises.unlink(filePath)
         console.log(`Successfully deleted file: ${fileUrl}`)
-    } catch (error: any) {
-        if (error.code === 'ENOENT') {
+    } catch (error: unknown) {
+        if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
             console.log(`File does not exist: ${fileUrl}`)
         } else {
             console.error(`Error deleting file ${fileUrl}:`, error)
@@ -134,8 +126,9 @@ export async function downloadAndSaveImageFromUrl(url: string, fileName: string)
     const destination = path.join(uploadsDir, safeFileName)
 
     // Save file
-    const fileStream = fs.createWriteStream(destination, { flags: "wx" })
-    await finished(Readable.fromWeb(res.body as any).pipe(fileStream))
+    if (!res.body) throw new Error("No response body")
+    const arrayBuffer = await res.arrayBuffer()
+    await fs.promises.writeFile(destination, Buffer.from(arrayBuffer))
 
     // Return relative path for DB
     return `/uploads/schedules/${safeFileName}`

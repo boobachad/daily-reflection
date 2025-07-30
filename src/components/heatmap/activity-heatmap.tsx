@@ -1,6 +1,5 @@
 "use client";
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ActivityData, CombinedActivityData } from "@/lib/heatmap/types";
 import { normalizeDate } from "@/lib/heatmap/data-transformer";
 import { AdaptiveTooltip } from "@/components/ui/adaptive-tooltip";
@@ -17,6 +16,21 @@ export const ActivityHeatmap = ({
     loading = false,
     error = null,
 }: ActivityHeatmapProps) => {
+    const [showLoadingState, setShowLoadingState] = useState(true); // Always start with loading animation
+
+    // Handle loading state completion - always allow the animation to complete
+    const handleLoadingComplete = () => {
+        setShowLoadingState(false);
+    };
+
+    // Show loading state if we're loading OR if the loading animation hasn't completed yet
+    const shouldShowLoading = loading || showLoadingState;
+
+    // If we should show loading, show the loading state
+    // Always pass the onComplete callback so the animation can finish regardless of data arrival
+    if (shouldShowLoading) {
+        return <HeatmapLoadingState onComplete={handleLoadingComplete} />;
+    }
     // Data processing adapted from testing-heatmap/components/LeetCodeHeatmap.tsx
     const getData = () => {
         // Early exit if no data
@@ -180,10 +194,7 @@ export const ActivityHeatmap = ({
         return chunks;
     };
 
-    // Loading state
-    if (loading) {
-        return <HeatmapLoadingState />;
-    }
+    // This section is now handled above with the state-based approach
 
     // Error state
     if (error) {

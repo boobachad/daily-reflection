@@ -1,6 +1,5 @@
 import { DbEntry, BaseEntry, EntryComputed, EntryWithComputed } from "./base"
-import { ApiEntry, ApiEntryList } from "./api"
-import { dateToUtcForDb, utcDateToDateString } from "@/lib/date-utils"
+import { ApiEntry } from "./api"
 
 /**
  * Convert a database entry to an API entry
@@ -47,13 +46,13 @@ export function dbToApiEntryWithComputed(entry: DbEntry, dayX: number): ApiEntry
 /**
  * Type guard for database entry
  */
-export function isDbEntry(obj: any): obj is DbEntry {
-    return obj && '_id' in obj && 'date' in obj
+export function isDbEntry(obj: unknown): obj is DbEntry {
+    return typeof obj === 'object' && obj !== null && '_id' in obj && 'date' in obj
 }
 
 /**
  * Type guard for API entry
  */
-export function isApiEntry(obj: any): obj is ApiEntry {
-    return obj && 'id' in obj && 'dayX' in obj && 'date' in obj
+export function isApiEntry(obj: unknown): obj is ApiEntry {
+    return typeof obj === 'object' && obj !== null && 'id' in obj && 'dayX' in obj && 'date' in obj
 } 

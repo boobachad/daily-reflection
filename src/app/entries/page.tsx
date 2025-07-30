@@ -63,7 +63,7 @@ export default async function EntriesPage() {
                         </h1>
                         <div className="flex items-center text-muted-foreground">
                             <CalendarDays className="h-5 w-5 mr-2" />
-                            <p className="text-lg">{entries.length} days recorded</p>
+                            <p className="text-lg">{entries.length} {entries.length === 1 ? 'day' : 'days'} recorded</p>
                         </div>
                     </div>
                     <Link

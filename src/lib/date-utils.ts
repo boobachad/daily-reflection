@@ -219,7 +219,7 @@ function getDateRangeForDay(dateString: string): { start: Date, end: Date } {
 
 // Checks if an entry exists for a given dateString using EntryModel
 // (import EntryModel where used, not here, to avoid circular deps)
-async function entryExistsForDate(dateString: string, EntryModel: any): Promise<boolean> {
+async function entryExistsForDate(dateString: string, EntryModel: { findOne: (query: unknown) => Promise<unknown> }): Promise<boolean> {
   const { start, end } = getDateRangeForDay(dateString)
   const entry = await EntryModel.findOne({ date: { $gte: start, $lte: end } })
   return !!entry

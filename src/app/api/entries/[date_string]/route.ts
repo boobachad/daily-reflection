@@ -72,14 +72,14 @@ export async function PUT(
             if (Object.prototype.hasOwnProperty.call(validatedData, 'expectedScheduleImageUrl')) {
                 // ENFORCE: Only one image per type per entry
                 if (validatedData.expectedScheduleImageUrl && entry.expectedScheduleImageUrl && validatedData.expectedScheduleImageUrl !== entry.expectedScheduleImageUrl) {
-                await deleteFile(entry.expectedScheduleImageUrl)
+                    await deleteFile(entry.expectedScheduleImageUrl)
                 }
                 entry.expectedScheduleImageUrl = validatedData.expectedScheduleImageUrl
             }
             if (Object.prototype.hasOwnProperty.call(validatedData, 'actualScheduleImageUrl')) {
                 // ENFORCE: Only one image per type per entry
                 if (validatedData.actualScheduleImageUrl && entry.actualScheduleImageUrl && validatedData.actualScheduleImageUrl !== entry.actualScheduleImageUrl) {
-                await deleteFile(entry.actualScheduleImageUrl)
+                    await deleteFile(entry.actualScheduleImageUrl)
                 }
                 entry.actualScheduleImageUrl = validatedData.actualScheduleImageUrl
             }
@@ -136,7 +136,8 @@ export async function GET(
 ) {
     try {
         await connectToDatabase()
-        const dateString = params.date_string
+        const resolvedParams = await params;
+        const dateString = resolvedParams.date_string
 
         const entry = await EntryModel.findOne({ date: new Date(dateString) })
         if (!entry) {

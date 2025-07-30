@@ -8,61 +8,60 @@ interface LoadingStep {
     id: string;
     label: string;
     icon: React.ReactNode;
-    duration: number;
     status: 'pending' | 'loading' | 'complete';
 }
 
 interface HeatmapLoadingStateProps {
     onComplete?: () => void;
+    totalDuration?: number; // Total loading duration in milliseconds
 }
 
-export const HeatmapLoadingState = ({ onComplete }: HeatmapLoadingStateProps) => {
+export const HeatmapLoadingState = ({ onComplete, totalDuration = 10000 }: HeatmapLoadingStateProps) => {
     const [currentStep, setCurrentStep] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
-    const [steps, setSteps] = useState<LoadingStep[]>([
+
+    // Define steps - each gets equal duration
+    const stepDefinitions: Omit<LoadingStep, 'status'>[] = [
         {
             id: 'config',
             label: 'Validating environment credentials...',
-            icon: <CheckCircle className="h-4 w-4" />,
-            duration: 400,
-            status: 'pending'
+            icon: <CheckCircle className="h-4 w-4" />
         },
         {
             id: 'github',
             label: 'Connecting to GitHub API...',
-            icon: <GitBranch className="h-4 w-4" />,
-            duration: 600,
-            status: 'pending'
+            icon: <GitBranch className="h-4 w-4" />
         },
         {
             id: 'leetcode',
             label: 'Fetching LeetCode submissions...',
-            icon: <Code className="h-4 w-4" />,
-            duration: 500,
-            status: 'pending'
+            icon: <Code className="h-4 w-4" />
         },
         {
             id: 'productivity',
             label: 'Loading productivity metrics...',
-            icon: <Database className="h-4 w-4" />,
-            duration: 400,
-            status: 'pending'
+            icon: <Database className="h-4 w-4" />
         },
         {
             id: 'processing',
             label: 'Analyzing activity patterns...',
-            icon: <Zap className="h-4 w-4" />,
-            duration: 450,
-            status: 'pending'
+            icon: <Zap className="h-4 w-4" />
         },
         {
             id: 'generating',
             label: 'Rendering interactive heatmap...',
-            icon: <Trophy className="h-4 w-4" />,
-            duration: 350,
-            status: 'pending'
+            icon: <Trophy className="h-4 w-4" />
         }
-    ]);
+    ];
+
+    // Calculate equal duration for each step
+    const stepDuration = Math.round(totalDuration / stepDefinitions.length);
+    const [steps, setSteps] = useState<LoadingStep[]>(
+        stepDefinitions.map(step => ({
+            ...step,
+            status: 'pending' as const
+        }))
+    );
 
     useEffect(() => {
         const processSteps = async () => {
@@ -74,8 +73,8 @@ export const HeatmapLoadingState = ({ onComplete }: HeatmapLoadingStateProps) =>
                 })));
                 setCurrentStep(i);
 
-                // Wait for step duration
-                await new Promise(resolve => setTimeout(resolve, steps[i].duration));
+                // Wait for equal step duration
+                await new Promise(resolve => setTimeout(resolve, stepDuration));
 
                 // Mark step as complete
                 setSteps(prev => prev.map((step, index) => ({
@@ -94,7 +93,7 @@ export const HeatmapLoadingState = ({ onComplete }: HeatmapLoadingStateProps) =>
         };
 
         processSteps();
-    }, [onComplete, steps.length]);
+    }, [onComplete, stepDuration]);
 
     const getStatusIcon = (step: LoadingStep) => {
         switch (step.status) {

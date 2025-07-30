@@ -50,7 +50,7 @@ export async function fetchProductivityData(
  */
 function calculateCompletionScore(entry: DbEntry): number {
     let score = 0;
-    let totalItems = 3; // reflection, expected schedule, actual schedule
+    const totalItems = 3; // reflection, expected schedule, actual schedule
 
     if (entry.reflectionText && entry.reflectionText.trim().length > 0) {
         score += 1;

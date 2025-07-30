@@ -9,7 +9,9 @@ import {
 import {
     ActivityData,
     HeatmapStats,
-    CombinedActivityData
+    CombinedActivityData,
+    GitHubJsonData,
+    LeetCodeJsonData
 } from "@/lib/heatmap/types";
 import { getCombinedDataWithStats } from "@/lib/heatmap/combined-data";
 
@@ -56,7 +58,7 @@ export const useHeatmapData = (githubUsername: string, leetcodeUsername: string)
 
         try {
             // Fetch data from all sources in parallel
-            const promises: Promise<any>[] = [];
+            const promises: Promise<unknown>[] = [];
 
             if (githubUsername) {
                 promises.push(axios.get('/api/github'));
@@ -82,21 +84,21 @@ export const useHeatmapData = (githubUsername: string, leetcodeUsername: string)
             if (githubUsername) {
                 const githubResult = results[resultIndex++];
                 if (githubResult.status === 'fulfilled') {
-                    githubData = transformGitHubData(githubResult.value.data);
+                    githubData = transformGitHubData((githubResult.value as { data: GitHubJsonData }).data);
                 }
             }
 
             if (leetcodeUsername) {
                 const leetcodeResult = results[resultIndex++];
                 if (leetcodeResult.status === 'fulfilled') {
-                    leetcodeData = transformLeetCodeData(leetcodeResult.value.data);
+                    leetcodeData = transformLeetCodeData((leetcodeResult.value as { data: LeetCodeJsonData }).data);
                 }
             }
 
             // Handle productivity data (always last)
             const productivityResult = results[resultIndex];
             if (productivityResult.status === 'fulfilled') {
-                productivityData = productivityResult.value.data.activityData;
+                productivityData = (productivityResult.value as { data: { activityData: ActivityData[] } }).data.activityData;
             } else {
                 console.warn('Failed to fetch productivity data:', productivityResult.reason);
             }

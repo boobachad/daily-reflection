@@ -9,7 +9,6 @@ import { useMutation } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { formatDateForDisplay, isPastDate } from "@/lib/date-utils"
-import { hasReflectionChanges } from "@/lib/utils"
 
 // Dynamically import the ImageUploader component for code splitting
 const ImageUploader = dynamic(
@@ -63,18 +62,6 @@ export default function EntryContent({
     entry?: Entry;
     dateString: string;
 }) {
-    // Defensive: if entry is missing, show a message and clear staged cache
-    if (!entry) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-background">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2 text-foreground">Entry Not Found</h2>
-                    <p className="text-muted-foreground mb-4">This entry does not exist or has been deleted.</p>
-                    <a href="/entries" className="text-blue-400 underline">Back to All Entries</a>
-                </div>
-            </div>
-        )
-    }
 
     const [reflectionContent, setReflectionContent] = useState(entry?.reflectionText || "")
     const [imageChanges, setImageChanges] = useState<{
@@ -191,110 +178,123 @@ export default function EntryContent({
     const actualImageUrl = entry?.actualScheduleImageUrl ?? null
     const stagedReflectionText = entry?.reflectionText ?? ''
 
+    // Defensive: if entry is missing, show a message and clear staged cache
+    if (!entry) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold mb-2 text-foreground">Entry Not Found</h2>
+                    <p className="text-muted-foreground mb-4">This entry does not exist or has been deleted.</p>
+                    <Link href="/entries" className="text-blue-400 underline">Back to All Entries</Link>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="min-h-screen bg-background">
             <div className="max-w-6xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-            {/* Header section with Day number, formatted date, and back link */}
+                {/* Header section with Day number, formatted date, and back link */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div className="space-y-1">
+                    <div className="space-y-1">
                         <h1 className="text-3xl font-bold text-foreground">Day {entry?.dayX}</h1>
                         <div className="flex items-center text-muted-foreground">
-                        <CalendarDays className="h-5 w-5 mr-2 flex-shrink-0" />
-                        {/* Format and display the date */}
-                        <p className="text-lg leading-tight">
-                            {formatDateForDisplay(dateString)}
-                        </p>
+                            <CalendarDays className="h-5 w-5 mr-2 flex-shrink-0" />
+                            {/* Format and display the date */}
+                            <p className="text-lg leading-tight">
+                                {formatDateForDisplay(dateString)}
+                            </p>
+                        </div>
                     </div>
-                </div>
-                {/* Link back to the entries list */}
-                <Link
-                    href="/entries"
+                    {/* Link back to the entries list */}
+                    <Link
+                        href="/entries"
                         className="text-sm font-medium flex items-center text-muted-foreground hover:text-foreground"
-                >
-                    ← Back to All Entries
-                </Link>
-            </div>
+                    >
+                        ← Back to All Entries
+                    </Link>
+                </div>
 
-            {/* Add save button at the top */}
+                {/* Add save button at the top */}
                 {!isLocked && (
                     <div className="flex justify-end mt-6 mb-8">
-                <Button
-                    onClick={() => saveEntry()}
-                    disabled={!hasChanges || isSaving}
+                        <Button
+                            onClick={() => saveEntry()}
+                            disabled={!hasChanges || isSaving}
                             className="bg-primary hover:bg-primary/80 text-primary-foreground"
-                >
-                    {isSaving ? (
-                        <>
+                        >
+                            {isSaving ? (
+                                <>
                                     <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-primary-foreground mr-2"></div>
-                            Saving...
-                        </>
-                    ) : (
-                        <>
-                            <Save className="mr-2 h-4 w-4" />
-                            Save All Changes
-                        </>
-                    )}
-                </Button>
-            </div>
+                                    Saving...
+                                </>
+                            ) : (
+                                <>
+                                    <Save className="mr-2 h-4 w-4" />
+                                    Save All Changes
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 )}
 
-            {/* Container for the two ImageUploader components */}
-            <div className="grid md:grid-cols-2 gap-6">
-                {/* Card for Expected Schedule Image Uploader */}
+                {/* Container for the two ImageUploader components */}
+                <div className="grid md:grid-cols-2 gap-6">
+                    {/* Card for Expected Schedule Image Uploader */}
                     <Card className="border-border bg-card">
                         <CardHeader className="border-b border-border">
                             <CardTitle className="text-foreground flex items-center gap-2">
                                 <CalendarDays className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span>Expected Schedule</span>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                        {/* Image uploader component for expected schedule */}
-                        <ImageUploader
+                                <span>Expected Schedule</span>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-6">
+                            {/* Image uploader component for expected schedule */}
+                            <ImageUploader
                                 initialImageUrl={expectedImageUrl}
-                            onImageChange={(url, hasChanges) => handleImageChange("expectedScheduleImageUrl", url, hasChanges)}
+                                onImageChange={(url, hasChanges) => handleImageChange("expectedScheduleImageUrl", url, hasChanges)}
                                 dateString={dateString}
                                 isLocked={isLocked}
-                        />
-                    </CardContent>
-                </Card>
+                            />
+                        </CardContent>
+                    </Card>
 
-                {/* Card for Actual Schedule Image Uploader */}
+                    {/* Card for Actual Schedule Image Uploader */}
                     <Card className="border-border bg-card">
                         <CardHeader className="border-b border-border">
                             <CardTitle className="text-foreground flex items-center gap-2">
                                 <CalendarDays className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            Actual Schedule
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                        {/* Image uploader component for actual schedule */}
-                        <ImageUploader
+                                Actual Schedule
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="pt-6">
+                            {/* Image uploader component for actual schedule */}
+                            <ImageUploader
                                 initialImageUrl={actualImageUrl}
-                            onImageChange={(url, hasChanges) => handleImageChange("actualScheduleImageUrl", url, hasChanges)}
+                                onImageChange={(url, hasChanges) => handleImageChange("actualScheduleImageUrl", url, hasChanges)}
                                 dateString={dateString}
                                 isLocked={isLocked}
-                        />
-                    </CardContent>
-                </Card>
-            </div>
+                            />
+                        </CardContent>
+                    </Card>
+                </div>
 
                 {/* Updated VeryRichTextEditor */}
                 <Card className="border-border bg-card mt-8">
                     <CardHeader className="border-b border-border">
                         <CardTitle className="text-foreground flex items-center gap-2">
                             <CalendarDays className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                        Daily Reflection
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-6">
+                            Daily Reflection
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-6">
                         <VeryRichTextEditor
                             initialContent={stagedReflectionText}
-                        onContentChange={handleReflectionChange}
+                            onContentChange={handleReflectionChange}
                             readOnly={isLocked}
-                    />
-                </CardContent>
-            </Card>
+                        />
+                    </CardContent>
+                </Card>
             </div>
         </div>
     )
