@@ -29,7 +29,6 @@ Inspired by Amitabh Bachchan's daily notes practice, this app combines:
 - **[README_INTERVIEW_GUIDE.md](./README_INTERVIEW_GUIDE.md)** - Start here! Quick interview prep guide
 - **[PROJECT_ANALYSIS.md](./PROJECT_ANALYSIS.md)** - Deep technical analysis of the entire codebase
 - **[INTERVIEW_PREPARATION.md](./INTERVIEW_PREPARATION.md)** - 26 common interview Q&A with detailed answers
-- **[codebase-analysis.md](./codebase-analysis.md)** - Additional codebase insights
 
 ## 🛠️ Setup
 

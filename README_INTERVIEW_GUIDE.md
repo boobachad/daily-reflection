@@ -22,9 +22,7 @@ If you're preparing for an interview about this project, here's your roadmap:
    - Sample opening statements
    - **Best for**: Practicing your interview responses
 
-3. **[codebase-analysis.md](./codebase-analysis.md)** (existing file)
-   - Original project analysis
-   - Additional context
+
 
 ---
 
@@ -97,11 +95,10 @@ between UTC storage and local display."
 
 ### Project Stats:
 - **Tech Stack**: Next.js 15, React 19, TypeScript, MongoDB, TailwindCSS
-- **Lines of Code**: ~5,000+ (estimated)
 - **Components**: 30+ React components
-- **API Routes**: 10+ endpoints
-- **External APIs**: 2 (GitHub, LeetCode)
-- **Development Time**: 4-5 weeks (estimated in interviews)
+- **API Routes**: 10+ endpoints  
+- **External APIs**: 2 (GitHub GraphQL, LeetCode GraphQL)
+- **Database Models**: 1 main Entry model with 7 fields
 
 ### Technical Highlights:
 - **Type Safety**: 100% TypeScript + Zod validation
