@@ -165,6 +165,9 @@ After your initial explanation, interviewers often ask:
 1. **Have the app running locally**
    ```bash
    bun install
+   # Start MongoDB first
+   mongod
+   # Then in another terminal:
    bun run dev
    # Open localhost:3000
    ```

@@ -204,6 +204,7 @@ Innovative feature that assigns each entry a sequential "Day X" number:
 
 1. **Code Splitting**: Dynamic imports for heavy components
    ```typescript
+   // '@/' is the TypeScript path alias for 'src/' directory
    const ImageUploader = dynamic(() => import("@/components/image-uploader"), { ssr: false })
    ```
 

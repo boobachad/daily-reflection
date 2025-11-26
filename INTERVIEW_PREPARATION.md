@@ -437,8 +437,8 @@ try {
 
 ## 🎤 Rapid-Fire Technical Questions
 
-### Q: "Why Next.js over Create React App?"
-**A:** Next.js provides SSR, API routes (full-stack), automatic code splitting, and optimized builds. CRA is deprecated. Since I need API routes for database access, Next.js was the clear choice.
+### Q: "Why Next.js over Create React App or Vite?"
+**A:** Next.js provides SSR, API routes (full-stack in one repo), automatic code splitting, and optimized builds. CRA is in maintenance mode and no longer actively developed. Vite is excellent for SPAs but lacks built-in backend capabilities. Since I need API routes for database access, Next.js was the clear choice.
 
 ### Q: "Why MongoDB over PostgreSQL?"
 **A:** Flexibility. Schema evolved during development. MongoDB allows adding fields without migrations. For complex relations, I might choose PostgreSQL.
